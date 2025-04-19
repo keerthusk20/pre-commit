@@ -58,12 +58,16 @@ repos:
     hooks:
       - id: flake8
         stages: [commit]
+        pass_filenames: false  # Only one pass_filenames line
 
   - repo: https://github.com/psf/black
     rev: 25.1.0
     hooks:
       - id: black
         stages: [commit]
+        pass_filenames: true
+        # Add this line to prevent failure on file modifications
+        always_run: true
 
   - repo: https://github.com/golangci/golangci-lint
     rev: v2.1.2
@@ -92,15 +96,16 @@ repos:
         pass_filenames: true
         stages: [commit]
 
-  - repo: local  # Use "local" for local hooks
+  - repo: local
     hooks:
       - id: custom-python-linter
         name: Custom Python Linter
-        entry: python3 custom_linter.py
+        entry: ./custom_linter.py
         language: system
         types: [python]
         description: Runs a custom Python linter to enforce coding standards.
         stages: [commit]
+
 
       - id: check-large-files
         name: Check for Large Files
@@ -159,3 +164,18 @@ repos:
         types: [c]
         files: \.(c|h)$
         stages: [commit]
+
+  - repo: local
+    hooks:
+      - id: custom-autocorrect
+        name: Custom AutoCorrect
+        entry: ./autocorrect.sh
+        language: script
+        pass_filenames: true
+        always_run: true
+        types: [file]
+        verbose: true
+        require_serial: true
+        stages: [commit]
+        args: []
+        exclude: ''
